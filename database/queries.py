@@ -1,11 +1,15 @@
 from datetime import datetime
 from psycopg2 import Error, pool
+from os import environ
+from dotenv import load_dotenv
 
-USER =
-PASSWORD =
-HOST =
-PORT = "5432"
-DATABASE = "postgres"
+load_dotenv()
+
+USER = environ.get('DATABASE_USERNAME')
+PASSWORD = environ.get('DATABASE_PASSWORD')
+HOST = environ.get('DATABASE_HOST')
+PORT = environ.get('DATABASE_PORT')
+DATABASE = environ.get('DATABASE_NAME')
 
 connection_pool = pool.SimpleConnectionPool(minconn=1, maxconn=20, user=USER,
                                             password=PASSWORD,
