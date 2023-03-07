@@ -30,10 +30,13 @@ async def get_status_in_range(start_time: datetime, end_time: datetime, store_id
 
         cursor.execute(query, params)
 
-        store_status_map: dict[str, list] = {}
+        # this loop will fill dummy values into dict
+        store_status_map: dict[str, list[list]] = {}
         for store_id in store_ids:
             store_status_map.setdefault(store_id, [])
         rows = cursor.fetchall()
+
+        # this loop will fill actual values into dict
         for row in rows:
             store_id = row[2]
             timestamp_utc = row[1]
@@ -65,6 +68,8 @@ async def get_store_business_hours(store_ids: list[str], days: list[int]):
 
         rows = cursor.fetchall()
         business_hours_map: dict[str, dict[int, list[list[str]]]] = {}
+
+        # this loop will fill actual values into dict
         for row in rows:
             start_time_local: str = row[0]
             end_time_local: str = row[1]
@@ -78,6 +83,8 @@ async def get_store_business_hours(store_ids: list[str], days: list[int]):
                     business_hours_map[store_id][day] = [[start_time_local, end_time_local]]
                 else:
                     business_hours_map[store_id][day].append([start_time_local, end_time_local])
+
+        # this loop will fill missing values into dict
         for store_id in store_ids:
             if business_hours_map.get(store_id, None) is None:
                 business_hours_map.setdefault(store_id, {})
@@ -87,7 +94,6 @@ async def get_store_business_hours(store_ids: list[str], days: list[int]):
                 for day in days:
                     if business_hours_map[store_id].get(day, None) is None:
                         business_hours_map[store_id][day] = [['00:00:00', '23:59:59']]
-        # print(business_hours_map)
         return business_hours_map
 
     except (Exception, Error) as error:
@@ -113,8 +119,11 @@ async def get_store_time_zone(store_ids: list[str]):
         rows = cursor.fetchall()
 
         store_timezones_map: dict[str, str] = {}
+        # this loop will fill actual values into dict
         for store_id in store_ids:
             store_timezones_map[store_id] = 'America/Chicago'
+
+        # this loop will fill missing values into dict
         for row in rows:
             timezone_str = row[0]
             store_id = row[1]
